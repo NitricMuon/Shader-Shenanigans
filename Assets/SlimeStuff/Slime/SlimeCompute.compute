@@ -1,0 +1,15 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel Update
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+RWTexture2D<float4> displayTexture;
+
+[numthreads(8,8,1)]
+void Update (uint3 id : SV_DispatchThreadID)
+{
+    // TODO: insert actual code here!
+    float3 idf = (float3)id;
+
+    displayTexture[id.xy] = float4(idf.x/2560, idf.y/1440, idf.x/2560 * idf.y/1440, 0);
+}
