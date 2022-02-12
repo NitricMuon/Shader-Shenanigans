@@ -49,7 +49,6 @@ public class CGoLManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Application.targetFrameRate = 60;
         Init();
         GetComponent<MeshRenderer>().material.mainTexture = displayTexture;
         compute.Dispatch(2, threadGroupX, threadGroupY, 1);

@@ -243,7 +243,7 @@ MonoBehaviour:
   rangeStart: 2
   rangeEnd: 3
   spawn: 3
-  cutoff: 0.8
+  cutoff: 0.5
   compute: {fileID: 7200000, guid: 2e41eecbc2c1a9e468debe1f1707c30e, type: 3}
 --- !u!23 &1399399276
 MeshRenderer:
