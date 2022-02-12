@@ -1,7 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.IO.Compression;
 using System.Net.Http.Headers;
+using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Accessibility;
 using UnityEngine.Experimental.Rendering;
@@ -23,34 +27,32 @@ public class CGoLManager : MonoBehaviour
     RenderTexture displayTexture;
     RenderTexture processTexture;
 
-    ComputeBuffer randomData;
-
-    private int updateKernel = 0;
-    private int displayKernel = 1;
+    private int threadGroupX;
+    private int threadGroupY;
 
     void Init()
     {
-        displayTexture = new RenderTexture(width, height, 0, defaultGFormat);
-        displayTexture.enableRandomWrite = true;
-        displayTexture.autoGenerateMips = false;
-        displayTexture.Create();
+        threadGroupX = Mathf.CeilToInt(width/8);
+        threadGroupY = Mathf.CeilToInt(height/8);
 
-        processTexture = new RenderTexture(width, height, 0, defaultGFormat);
-        processTexture.enableRandomWrite = true;
-        processTexture.autoGenerateMips = false;
-        processTexture.Create();
+        CreateRenderTexture(ref displayTexture, width, height);
+        CreateRenderTexture(ref processTexture, width, height);
 
-        compute.SetTexture(updateKernel, "displayTexture", displayTexture);
-        compute.SetTexture(updateKernel, "processTexture", processTexture);
+        compute.SetTexture(0, "displayTexture", displayTexture);
+        compute.SetTexture(0, "processTexture", processTexture);
 
-        compute.SetTexture(displayKernel, "displayTexture", displayTexture);
-        compute.SetTexture(displayKernel, "processTexture", processTexture);
+        compute.SetTexture(1, "displayTexture", displayTexture);
+        compute.SetTexture(1, "processTexture", processTexture);
+
+        compute.SetTexture(2, "displayTexture", displayTexture);
 
         compute.SetInt("width", width);
         compute.SetInt("height", height);
         compute.SetInt("rangeStart", rangeStart);
         compute.SetInt("rangeEnd", rangeEnd);
         compute.SetInt("spawn", spawn);
+        compute.SetVector("ALIVE", Vector4.one);
+        compute.SetVector("DEAD", Vector4.zero);
     }
 
     // Start is called before the first frame update
@@ -58,51 +60,42 @@ public class CGoLManager : MonoBehaviour
     {
         Init();
         GetComponent<MeshRenderer>().material.mainTexture = displayTexture;
-
-        int stride = System.Runtime.InteropServices.Marshal.SizeOf(typeof(Vector2));
-        int count = width * height;
-        int initialCells = 1000000;
-        randomData = new ComputeBuffer(count, stride);
-
-        Vector2[] cells = new Vector2[initialCells];
-
-        for (int i = 0; i < initialCells; i++)
-        {
-            cells[i] = new Vector2Int(Random.Range(0, width), Random.Range(0, height));
-        }
-        randomData.SetData(cells);
-        compute.SetBuffer(2, "randomData", randomData);
-        compute.SetTexture(2, "displayTexture", displayTexture);
-        
-        int threadGroupX = Mathf.CeilToInt(count/64);
-        compute.Dispatch(2, threadGroupX, 1, 1);
-
-        randomData.Release();
+        compute.Dispatch(2, threadGroupX, threadGroupY, 1);
     }
 
     // Update is called once per frame
     void Update()
     {
-        compute.SetInt("width", width);
-        compute.SetInt("height", height);
-        compute.SetInt("rangeStart", rangeStart);
-        compute.SetInt("rangeEnd", rangeEnd);
-        compute.SetInt("spawn", spawn);
 
-        int threadGroupX = Mathf.CeilToInt(width/8);
-        int threadGroupY = Mathf.CeilToInt(height/8);
-        //compute.Dispatch(updateKernel, threadGroupX, threadGroupY, 1);
-
-        compute.Dispatch(displayKernel, threadGroupX, threadGroupY, 1);
     }
 
     void FixedUpdate()
     {
-        
+        compute.SetFloat("time", Time.fixedTime);
+        compute.SetFloat("deltaTime", Time.fixedDeltaTime);
+
+
+        //compute.Dispatch(0, threadGroupX, threadGroupY, 1);
+        //compute.Dispatch(1, threadGroupX, threadGroupY, 1);
     }
 
     void LateUpdate()
     {
         
     }
+
+    public static void CreateStructuredBuffer<T>(ref ComputeBuffer buffer, int count)
+    {
+        int stride = System.Runtime.InteropServices.Marshal.SizeOf<T>();
+        buffer = new ComputeBuffer(count, stride);
+    }
+
+    public static void CreateRenderTexture(ref RenderTexture texture, int width, int height, int depth = 0, GraphicsFormat format = defaultGFormat)
+    {
+        texture = new RenderTexture(width, height, depth, format);
+        texture.enableRandomWrite = true;
+        texture.autoGenerateMips = false;
+        texture.Create();
+    }
+    
 }

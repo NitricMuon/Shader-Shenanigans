@@ -1,14 +1,31 @@
 // Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel Update
 
-// Create a RenderTexture with enableRandomWrite flag and set it
-// with cs.SetTexture
+// Hash function www.cs.ubc.ca/~rbridson/docs/schechter-sca08-turbulence.pdf
+uint hash(uint state)
+{
+    state ^= 2747636419u;
+    state *= 2654435769u;
+    state ^= state >> 16;
+    state *= 2654435769u;
+    state ^= state >> 16;
+    state *= 2654435769u;
+    return state;
+}
+
+float scaleToRange01(uint state)
+{
+    return state / 4294967295.0;
+}
+
 RWTexture2D<float4> displayTexture;
 RWTexture2D<float4> processTexture;
-float4 ALIVE = float4(1, 1, 1, 0);
-float4 DEAD = float4(0, 0, 0, 0);
+float4 ALIVE;
+float4 DEAD;
 int width;
 int height;
+float deltaTime;
+float time;
 
 int rangeStart;
 int rangeEnd;
@@ -42,15 +59,13 @@ void Update (uint3 id : SV_DispatchThreadID)
 [numthreads(8,8,1)]
 void Display (uint3 id: SV_DispatchThreadID)
 {
-    displayTexture[id.xy] = (float4)processTexture[id.xy];
+    displayTexture[id.xy] = processTexture[id.xy];
 }
 
 #pragma kernel Initialize
 
-StructuredBuffer<float2> randomData;
-
-[numthreads(64,1,1)]
+[numthreads(8,8,1)]
 void Initialize (uint3 id: SV_DispatchThreadID)
 {
-    displayTexture[randomData[id.x].xy] = float4(1, 1, 1, 0);
+    displayTexture[id.xy] = ALIVE;
 }
