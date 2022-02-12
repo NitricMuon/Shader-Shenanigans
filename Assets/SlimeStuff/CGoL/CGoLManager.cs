@@ -93,5 +93,4 @@ public class CGoLManager : MonoBehaviour
         texture.autoGenerateMips = true;
         texture.Create();
     }
-    
 }
