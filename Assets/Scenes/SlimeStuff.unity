@@ -218,6 +218,7 @@ GameObject:
   - component: {fileID: 1399399277}
   - component: {fileID: 1399399276}
   - component: {fileID: 1399399275}
+  - component: {fileID: 1399399279}
   m_Layer: 0
   m_Name: CGoLSimulation
   m_TagString: Untagged
@@ -237,11 +238,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e4edb4a9475c1c498a75c547a255b51, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  width: 720
-  height: 1280
-  rangeStart: 3
-  rangeEnd: 4
-  spawn: 4
+  width: 1440
+  height: 2560
+  rangeStart: 2
+  rangeEnd: 3
+  spawn: 3
+  cutoff: 0.8
   compute: {fileID: 7200000, guid: 2e41eecbc2c1a9e468debe1f1707c30e, type: 3}
 --- !u!23 &1399399276
 MeshRenderer:
@@ -307,3 +309,33 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+--- !u!114 &1399399279
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1399399274}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Actions: {fileID: -944628639613478452, guid: 3b5d69b27a4f7f445a1a849df156563c, type: 3}
+  m_NotificationBehavior: 0
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents: []
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: 
+  m_DefaultActionMap: Main
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}

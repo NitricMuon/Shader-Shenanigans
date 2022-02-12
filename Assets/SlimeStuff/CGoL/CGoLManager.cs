@@ -1,13 +1,4 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Net.Http.Headers;
-using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.Accessibility;
 using UnityEngine.Experimental.Rendering;
 
 public class CGoLManager : MonoBehaviour
@@ -22,6 +13,7 @@ public class CGoLManager : MonoBehaviour
     public int rangeStart = 2;
     public int rangeEnd = 3;
     public int spawn = 3;
+    public float cutoff;
 
     public ComputeShader compute;
     RenderTexture displayTexture;
@@ -41,8 +33,8 @@ public class CGoLManager : MonoBehaviour
         compute.SetTexture(0, "displayTexture", displayTexture);
         compute.SetTexture(0, "processTexture", processTexture);
 
-        compute.SetTexture(1, "displayTexture", displayTexture);
-        compute.SetTexture(1, "processTexture", processTexture);
+        // compute.SetTexture(1, "displayTexture", displayTexture);
+        // compute.SetTexture(1, "processTexture", processTexture);
 
         compute.SetTexture(2, "displayTexture", displayTexture);
 
@@ -51,13 +43,13 @@ public class CGoLManager : MonoBehaviour
         compute.SetInt("rangeStart", rangeStart);
         compute.SetInt("rangeEnd", rangeEnd);
         compute.SetInt("spawn", spawn);
-        compute.SetVector("ALIVE", Vector4.one);
-        compute.SetVector("DEAD", Vector4.zero);
+        compute.SetFloat("cutoff", cutoff);
     }
 
     // Start is called before the first frame update
     void Start()
     {
+        Application.targetFrameRate = 60;
         Init();
         GetComponent<MeshRenderer>().material.mainTexture = displayTexture;
         compute.Dispatch(2, threadGroupX, threadGroupY, 1);
@@ -71,17 +63,21 @@ public class CGoLManager : MonoBehaviour
 
     void FixedUpdate()
     {
-        compute.SetFloat("time", Time.fixedTime);
-        compute.SetFloat("deltaTime", Time.fixedDeltaTime);
 
-
-        //compute.Dispatch(0, threadGroupX, threadGroupY, 1);
-        //compute.Dispatch(1, threadGroupX, threadGroupY, 1);
     }
 
     void LateUpdate()
     {
         
+    }
+
+    void OnMouseDown()
+    {
+        compute.SetFloat("time", Time.fixedTime);
+        //compute.SetFloat("deltaTime", Time.fixedDeltaTime);
+
+        compute.Dispatch(0, threadGroupX, threadGroupY, 1);
+        //compute.Dispatch(1, threadGroupX, threadGroupY, 1);
     }
 
     public static void CreateStructuredBuffer<T>(ref ComputeBuffer buffer, int count)
@@ -94,7 +90,7 @@ public class CGoLManager : MonoBehaviour
     {
         texture = new RenderTexture(width, height, depth, format);
         texture.enableRandomWrite = true;
-        texture.autoGenerateMips = false;
+        texture.autoGenerateMips = true;
         texture.Create();
     }
     

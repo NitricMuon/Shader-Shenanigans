@@ -1,0 +1,33 @@
+{
+    "name": "MainScheme",
+    "maps": [
+        {
+            "name": "Main",
+            "id": "1d6c780f-ec22-4270-9c05-746909e131e9",
+            "actions": [
+                {
+                    "name": "MouseDown",
+                    "type": "Button",
+                    "id": "33d005c5-107d-4024-a661-351a3154375f",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "e4a63ece-672c-454e-9c37-68d28baa8b66",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "MouseDown",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}

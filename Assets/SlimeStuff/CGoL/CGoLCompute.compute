@@ -20,8 +20,6 @@ float scaleToRange01(uint state)
 
 RWTexture2D<float4> displayTexture;
 RWTexture2D<float4> processTexture;
-float4 ALIVE;
-float4 DEAD;
 int width;
 int height;
 float deltaTime;
@@ -39,18 +37,21 @@ void Update (uint3 id : SV_DispatchThreadID)
     {
         for (int offsetY = -1; offsetY <= 1; offsetY++)
         {
-            int indexX = min(width - 1, max(id.x + offsetX, 0));
-            int indexY = min(height - 1, max(id.y + offsetY, 0));
-            sum += (int)displayTexture[int2(indexX, indexY)].x;
+            if (offsetX != 0 && offsetY != 0)
+            {
+                int indexX = id.x + offsetX;
+                int indexY = id.y + offsetY;
+                sum += displayTexture[int2(indexX, indexY)].x;
+            }
         }
     }
-    if (sum < rangeStart || sum > rangeEnd)
+    if (sum == spawn)
     {
-        processTexture[id.xy] = DEAD;
+        displayTexture[id.xy] = 1;
     }
-    else if (sum = spawn)
+    else if (sum < rangeStart || sum > rangeEnd)
     {
-        processTexture[id.xy] = ALIVE;
+        displayTexture[id.xy] = 0;
     }
 }
 
@@ -64,8 +65,16 @@ void Display (uint3 id: SV_DispatchThreadID)
 
 #pragma kernel Initialize
 
+float cutoff;
+
+// no touchy, it works
 [numthreads(8,8,1)]
 void Initialize (uint3 id: SV_DispatchThreadID)
 {
-    displayTexture[id.xy] = ALIVE;
+    uint random = hash(id.y * width + id.x + hash(time));
+    float randomScaled = scaleToRange01(random);
+    if (randomScaled >= cutoff)
+    {
+        displayTexture[id.xy] = 1;
+    }
 }
