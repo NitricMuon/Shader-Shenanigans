@@ -20,8 +20,6 @@ float scaleToRange01(uint state)
 
 RWTexture2D<float4> displayTexture;
 RWTexture2D<float4> processTexture;
-int width;
-int height;
 float deltaTime;
 float time;
 
@@ -41,18 +39,12 @@ void Update (uint3 id : SV_DispatchThreadID)
             {
                 int indexX = id.x + offsetX;
                 int indexY = id.y + offsetY;
-                sum += displayTexture[int2(indexX, indexY)].x;
+                sum += (int)displayTexture[int2(indexX, indexY)].x;
             }
         }
     }
-    if (sum == spawn)
-    {
-        displayTexture[id.xy] = 1;
-    }
-    else if (sum < rangeStart || sum > rangeEnd)
-    {
-        displayTexture[id.xy] = 0;
-    }
+    if (sum == spawn) processTexture[id.xy] = 1;
+    else if (sum < rangeStart || sum > rangeEnd) processTexture[id.xy] = 0;
 }
 
 #pragma kernel Display

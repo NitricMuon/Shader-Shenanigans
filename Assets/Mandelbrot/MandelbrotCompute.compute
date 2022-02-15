@@ -1,0 +1,47 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+uint scalar;
+int maxIterations;
+int2 minimums;
+int2 maximums;
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+RWTexture2D<float4> result;
+
+// given id.xy = <x,y> = z = a+ib
+// z^2 = a^2 + 2iab - b^2
+// z^2 = <a^2 - b^2, 2ab>
+
+double2 square(double2 z)
+{
+    double a = (z.x * z.x) - (z.y * z.y);
+    double b = 2 * z.x * z.y;
+    return double2(a, b); 
+}
+
+double2 MandelbrotFunc(double2 z, double2 c)
+{
+    return double2(square(z) + c);
+}
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    double2 c = id.xy / scalar;
+    double2 z = 0;
+    for (int i = 0; i < maxIterations; i++)
+    {
+        if (z.x < minimums.x || z.x > maximums.x || z.y < minimums.y || z.y > maximums.y)
+        {
+            result[id.xy] = 1;
+            return;
+        }
+        else 
+        {
+            z = MandelbrotFunc(z, c);
+        }
+    }
+    result[id.xy] = 0;
+}

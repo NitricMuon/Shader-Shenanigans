@@ -10,12 +10,12 @@ public class CGoLManager : MonoBehaviour
     public int height = 1440;
 
     [HeaderAttribute("Simulation Settings")]
+    public ComputeShader compute;
     public int rangeStart = 2;
     public int rangeEnd = 3;
     public int spawn = 3;
     public float cutoff;
 
-    public ComputeShader compute;
     RenderTexture displayTexture;
     RenderTexture processTexture;
 
@@ -33,13 +33,11 @@ public class CGoLManager : MonoBehaviour
         compute.SetTexture(0, "displayTexture", displayTexture);
         compute.SetTexture(0, "processTexture", processTexture);
 
-        // compute.SetTexture(1, "displayTexture", displayTexture);
-        // compute.SetTexture(1, "processTexture", processTexture);
+        compute.SetTexture(1, "displayTexture", displayTexture);
+        compute.SetTexture(1, "processTexture", processTexture);
 
         compute.SetTexture(2, "displayTexture", displayTexture);
 
-        compute.SetInt("width", width);
-        compute.SetInt("height", height);
         compute.SetInt("rangeStart", rangeStart);
         compute.SetInt("rangeEnd", rangeEnd);
         compute.SetInt("spawn", spawn);
@@ -76,7 +74,7 @@ public class CGoLManager : MonoBehaviour
         //compute.SetFloat("deltaTime", Time.fixedDeltaTime);
 
         compute.Dispatch(0, threadGroupX, threadGroupY, 1);
-        //compute.Dispatch(1, threadGroupX, threadGroupY, 1);
+        compute.Dispatch(1, threadGroupX, threadGroupY, 1);
     }
 
     public static void CreateStructuredBuffer<T>(ref ComputeBuffer buffer, int count)
@@ -90,6 +88,7 @@ public class CGoLManager : MonoBehaviour
         texture = new RenderTexture(width, height, depth, format);
         texture.enableRandomWrite = true;
         texture.autoGenerateMips = true;
+        texture.filterMode = FilterMode.Point;
         texture.Create();
     }
 }
