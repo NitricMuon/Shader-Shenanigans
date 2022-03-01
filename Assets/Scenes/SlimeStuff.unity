@@ -516,11 +516,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   width: 2560
   height: 1440
-  compute: {fileID: 0}
-  maxInterations: 100
+  compute: {fileID: 7200000, guid: ea3100f573e450f49862af538732b4a6, type: 3}
+  maxIterations: 256
   scalar: 1
-  minimums: {x: 0, y: 0}
-  maximums: {x: 0, y: 0}
+  botleft: {x: -2, y: -1.12}
+  topright: {x: 0.47, y: 1.12}
 --- !u!23 &1939506350
 MeshRenderer:
   m_ObjectHideFlags: 0
